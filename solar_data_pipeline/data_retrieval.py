@@ -36,29 +36,47 @@ class DataRetrieval:
         #data_candidates = list(zip(data_1, data_2))
         data_candidates = {"cassandra": data_1, "file": data_2}
 
-        random_choice_list = self._construct_random_choice_list(partition_ratio)
+        random_choice_list = self._construct_random_choice_list(
+            partition_ratio, len(data_1))
 
         print("random_choice_list: %s" % (random_choice_list))
 
-        daily_signal_based_data = np.array(
-            [data_candidates[random.choice(random_choice_list)][i]
-             for i in range(len(data_1))])
+        daily_signal_based_data = self._random_choice(data_candidates,
+            random_choice_list, len(data_1))
 
         # Transpose to make the matrix with row of yearly data and column of
         # daily data:
         return daily_signal_based_data.T
 
-    def _construct_random_choice_list(self, partition_ratio):
+    def _construct_random_choice_list(self, partition_ratio,
+                                      total_number_of_elements):
+        """
+        Arguments
+        -----------------
+        partition_ratio : Dictionary
+            Key: Name of data source.
+            Value: Between 0 ane 1. Ratio of data from that data source.
+        total_number_of_elements: integer
+            Total number of elements of the choice list.
+        """
+
         if len(partition_ratio) == 0:
            # Simple implementation as a start with assumption
            # with two data sources
            return ["cassandra", "file"]
         else:
-           # Ratio is given in the number between 0 and 1.
-           # Multiplying it with 100 makes the value percentage:
            return functools.reduce(lambda choice_list, key:
-               choice_list + ([key] * int(partition_ratio[key] * 100)),
+               choice_list + (
+               [key] * int(partition_ratio[key] * total_number_of_elements)),
                partition_ratio, [])
+
+    def _random_choice(self, data_candidates, random_choice_list,
+        total_number_of_elements):
+        sample = np.random.choice(random_choice_list, total_number_of_elements,
+            replace=False)
+        return np.array(
+            [data_candidates[sample[i]][i]
+             for i in range(total_number_of_elements)])
 
     def _get_cassandra_data_access(self):
         return self._cassandra_data_access

@@ -68,7 +68,7 @@ class TestDataRetrieval(unittest.TestCase):
         mock_csv_access = Mock(spec=CsvAccess)
         mock_csv_access.retrieve.return_value = daily_data_2.T
 
-        date_index_range=range(4)
+        date_index_range = range(4)
 
         data_retrieval = DataRetrieval()
 
@@ -96,12 +96,13 @@ class TestDataRetrieval(unittest.TestCase):
     def test_construct_random_choice_list(self):
 
         partition_ratio = {"cassandra": 0.5, "file": 0.5}
+        total_number_of_elements = 4
 
         data_retrieval = DataRetrieval()
 
         actual_list = data_retrieval._construct_random_choice_list(
-            partition_ratio)
+            partition_ratio, total_number_of_elements)
 
-        expected_list = ['cassandra'] * 50 + ['file'] * 50
+        expected_list = ['cassandra'] * 2 + ['file'] * 2
 
         np.testing.assert_array_equal(actual_list, expected_list)

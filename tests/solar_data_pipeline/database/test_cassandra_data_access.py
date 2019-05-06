@@ -91,24 +91,24 @@ class TestCassandraDataAccess(unittest.TestCase):
         actual_data = data_access.retrieve()
 
         # Temp:
-        import matplotlib.pyplot as plt
-        plt.imshow(actual_data)
-        plt.show()
-        plt.plot(actual_data)
-        plt.show()
-        import sys
-        np.set_printoptions(threshold=sys.maxsize)
-        actual_data_shape = actual_data.shape
-        print("actual_data[0]: %s" % (actual_data[0]))
+        # import matplotlib.pyplot as plt
+        # plt.imshow(actual_data)
+        # plt.show()
+        # plt.plot(actual_data)
+        # plt.show()
+        # import sys
+        # np.set_printoptions(threshold=sys.maxsize)
+        # actual_data_shape = actual_data.shape
+        # print("actual_data[0]: %s" % (actual_data[0]))
         # print("actual_data[0].meas_val_f: %s" % (actual_data[0].meas_val_f))
         # print("actual_data[0].ts: %s" % (actual_data[0].ts))
 
         expected_data = self._power_signals[:, :2]
 
         # Temps;
-        plt.imshow(expected_data)
-        plt.show()
-        plt.plot(expected_data)
-        plt.show()
+        # plt.imshow(expected_data)
+        # plt.show()
+        # plt.plot(expected_data)
+        # plt.show()
 
         np.testing.assert_almost_equal(actual_data, expected_data, decimal=5)

@@ -31,15 +31,13 @@ class DataRetrieval:
         # Simple implementation as a start with assumption with two data sources
         # Transpose the matrix, so that in array of array format, each element
         # of outer array contains daily signal:
-        data_1 = self._cassandra_data_access.retrieve().T
-        data_2 = self._csv_access.retrieve().T
+        data_1 = self._get_cassandra_data_access().retrieve().T
+        data_2 = self._get_csv_access().retrieve().T
         #data_candidates = list(zip(data_1, data_2))
         data_candidates = {"cassandra": data_1, "file": data_2}
 
         random_choice_list = self._construct_random_choice_list(
             partition_ratio, len(data_1))
-
-        print("random_choice_list: %s" % (random_choice_list))
 
         daily_signal_based_data = self._random_choice(data_candidates,
             random_choice_list, len(data_1))
@@ -79,6 +77,14 @@ class DataRetrieval:
              for i in range(total_number_of_elements)])
 
     def _get_cassandra_data_access(self):
+        if ((not hasattr(self, '_cassandra_data_access')) or
+           (self._cassandra_data_access is None)):
+           from solar_data_pipeline.database.cassandra import\
+               CassandraDataAccess
+           # This will be read from configuration file:
+           cassandra_ip_address = '127.0.0.1'
+           self._cassandra_data_access = CassandraDataAccess(
+               cassandra_ip_address)
         return self._cassandra_data_access
 
     def _set_cassandra_data_access(self, data_access):
@@ -90,6 +96,12 @@ class DataRetrieval:
         self._cassandra_data_access = data_access
 
     def _get_csv_access(self):
+        if ((not hasattr(self, '_csv_access')) or
+           (self._csv_access is None)):
+           from solar_data_pipeline.file.csv import CsvAccess
+           # This will be read from configuration file:
+           file_url = './test.csv'
+           self._csv_access = CsvAccess(file_url)
         return self._csv_access
 
     def _set_csv_access(self, access):

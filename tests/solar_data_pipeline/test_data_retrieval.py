@@ -15,23 +15,6 @@ class TestDataRetrieval(unittest.TestCase):
         with open(input_power_signals_file_path) as file:
             self._power_signals = np.loadtxt(file, delimiter=',')
 
-    @unittest.skip("Fix after the other test is complete")
-    def test_get_data_for_two_days_for_one_site(self):
-
-        mock_cassandra_data_access = Mock(spec=CassandraDataAccess)
-        mock_cassandra_data_access.retrieve.return_value =\
-            self._power_signals.T[:2].T
-
-        date_index_range=range(2)
-
-        data_retrieval = DataRetrieval()
-
-        data_retrieval._set_cassandra_data_access(mock_cassandra_data_access)
-
-        actual_data = data_retrieval.get(date_index_range=date_index_range)
-
-        expected_data = self._power_signals.T[:2].T
-
     def test_get_data_for_four_days_for_two_sites(self):
 
         mock_cassandra_data_access = Mock(spec=CassandraDataAccess)

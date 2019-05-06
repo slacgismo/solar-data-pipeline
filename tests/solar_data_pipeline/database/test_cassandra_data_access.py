@@ -77,10 +77,10 @@ class TestCassandraDataAccess(unittest.TestCase):
                 timedelta_value += 5
 
     def tearDown(self):
-        # for raw_measurement in self._raw_measurements:
-        #     raw_measurement.delete()
-        pass
+        for raw_measurement in self._raw_measurements:
+            raw_measurement.delete()
 
+    @unittest.skip("This test accesses Cassandra database.")
     def test_retrieve(self):
         """
         CassandraDataAccess accesses Cassandra database. Thus, this test

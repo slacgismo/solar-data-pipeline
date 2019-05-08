@@ -5,6 +5,7 @@ from datetime import timedelta
 import numpy as np
 from cassandra.cqlengine import connection
 from cassandra.cqlengine.query import BatchQuery
+from cassandra.cqlengine.management import sync_table
 from solar_data_pipeline.database.cassandra import CassandraDataAccess
 from solar_data_pipeline.database.models.measurements import MeasurementRaw
 from solar_data_pipeline.database.models.measurements import Geopoint
@@ -24,11 +25,12 @@ class TestCassandraDataAccess(unittest.TestCase):
         with open(input_power_signals_file_path) as file:
             one_year_power_signals = np.loadtxt(file, delimiter=',')
 
-        # Use only the first 5 days in order to reduce execution time:
-        self._power_signals = one_year_power_signals[:, :5]
+        # Use only 5 days in order to reduce execution time:
+        self._power_signals_site_1 = one_year_power_signals[:, :5]
+        self._power_signals_site_2 = one_year_power_signals[:, 5:10]
         # Temp:
         # import matplotlib.pyplot as plt
-        # plt.imshow(self._power_signals)
+        # plt.imshow(self._power_signals_site_1)
         # plt.show()
 
         self._cassandra_ip_address = '127.0.0.1'
@@ -51,16 +53,26 @@ class TestCassandraDataAccess(unittest.TestCase):
         #         meas_val_b = None,
         #         meas_val_f = value,
         #         meas_val_s = None)
-        #     for i, daily_signal in enumerate(self._power_signals.T)
+        #     for i, daily_signal in enumerate(self._power_signals_site_1.T)
         #     for j, value in enumerate(daily_signal)
         # ]
         self._raw_measurements = []
+        self._populate_database(self._power_signals_site_1, "SLACA0000001",
+            start_time)
+        self._populate_database(self._power_signals_site_2, "SLACA0000002",
+            start_time)
+
+    def tearDown(self):
+        for raw_measurement in self._raw_measurements:
+            raw_measurement.delete()
+
+    def _populate_database(self, power_signals, site_name, start_time):
         timedelta_value = 0
-        for i, daily_signal in enumerate(self._power_signals.T):
+        for i, daily_signal in enumerate(power_signals.T):
             for j, value in enumerate(daily_signal):
                 self._raw_measurements.append(
                     MeasurementRaw.create(
-                        site = "SLACA0000001",
+                        site = site_name,
                         meas_name = "ac_power",
                         ts = start_time + timedelta(minutes=timedelta_value),
                         sensor = "000001-0A00-0001_ABC-1000p-AA-1",
@@ -76,11 +88,7 @@ class TestCassandraDataAccess(unittest.TestCase):
                 )
                 timedelta_value += 5
 
-    def tearDown(self):
-        for raw_measurement in self._raw_measurements:
-            raw_measurement.delete()
-
-    @unittest.skip("This test accesses Cassandra database.")
+    #@unittest.skip("This test accesses Cassandra database.")
     def test_retrieve(self):
         """
         CassandraDataAccess accesses Cassandra database. Thus, this test
@@ -103,7 +111,7 @@ class TestCassandraDataAccess(unittest.TestCase):
         # print("actual_data[0].meas_val_f: %s" % (actual_data[0].meas_val_f))
         # print("actual_data[0].ts: %s" % (actual_data[0].ts))
 
-        expected_data = self._power_signals[:, :2]
+        expected_data = self._power_signals_site_1[:, :2]
 
         # Temps;
         # plt.imshow(expected_data)

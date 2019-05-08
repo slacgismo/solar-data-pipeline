@@ -18,6 +18,13 @@ class CassandraDataAccess:
         return np.array([raw_measurement.site
             for raw_measurement in raw_measurement_list])
 
+    def get_sites(self):
+        self._set_up_connection()
+        query = MeasurementRaw.objects.all()
+        raw_measurement_list = list(query.distinct(['site']))
+        return np.array([raw_measurement.site
+            for raw_measurement in raw_measurement_list])
+
     def retrieve(self):
         self._set_up_connection()
         # Simple implementation as a start:

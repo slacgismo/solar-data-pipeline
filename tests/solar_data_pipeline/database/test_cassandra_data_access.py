@@ -99,8 +99,8 @@ class TestCassandraDataAccess(unittest.TestCase):
                 )
                 timedelta_value += 5
 
-    # @unittest.skip("This test accesses Cassandra database." +
-    # "Thus, this test will not be a part of continuous integration.")
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_find_sites(self):
         data_access = CassandraDataAccess(
             TestCassandraDataAccess._cassandra_ip_address)
@@ -114,6 +114,15 @@ class TestCassandraDataAccess(unittest.TestCase):
         np.testing.assert_array_equal(actual_nonexisting_sites,
                                       expected_nonexisting_sites)
 
+    def test_get_sites(self):
+        data_access = CassandraDataAccess(
+            TestCassandraDataAccess._cassandra_ip_address)
+
+        actual_sites = data_access.get_sites()
+        expected_sites = np.array(["SLACA0000001", "SLACA0000002"])
+
+        np.testing.assert_array_equal(actual_sites, expected_sites)
+
     @unittest.skip("This test accesses Cassandra database." +
     "Thus, this test will not be a part of continuous integration.")
     def test_retrieve(self):
@@ -121,6 +130,41 @@ class TestCassandraDataAccess(unittest.TestCase):
         data_access = CassandraDataAccess(
             TestCassandraDataAccess._cassandra_ip_address)
         actual_data = data_access.retrieve()
+
+        # Temp:
+        # import matplotlib.pyplot as plt
+        # plt.imshow(actual_data)
+        # plt.show()
+        # plt.plot(actual_data)
+        # plt.show()
+        # import sys
+        # np.set_printoptions(threshold=sys.maxsize)
+        # actual_data_shape = actual_data.shape
+        # print("actual_data[0]: %s" % (actual_data[0]))
+        # print("actual_data[0].meas_val_f: %s" % (actual_data[0].meas_val_f))
+        # print("actual_data[0].ts: %s" % (actual_data[0].ts))
+
+        expected_data = TestCassandraDataAccess._power_signals_site_1[:, :2]
+
+        # Temps;
+        # plt.imshow(expected_data)
+        # plt.show()
+        # plt.plot(expected_data)
+        # plt.show()
+
+        np.testing.assert_almost_equal(actual_data, expected_data, decimal=5)
+
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
+    def test_retrieve_for_date_range(self):
+
+        start_time = datetime(2019, 1, 1, 9, 0, 0)
+        end_time = datetime(2019, 1, 1, 10, 0, 0)
+
+        data_access = CassandraDataAccess(
+            TestCassandraDataAccess._cassandra_ip_address)
+        actual_data = data_access.retrieve(start_time=start_time,
+                                           end_time=end_time)
 
         # Temp:
         # import matplotlib.pyplot as plt

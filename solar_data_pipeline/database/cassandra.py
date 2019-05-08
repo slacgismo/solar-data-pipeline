@@ -10,6 +10,14 @@ class CassandraDataAccess:
     def __init__(self, ip_address):
         self._ip_address = ip_address
 
+    def find_sites(self, site_name_pattern):
+        self._set_up_connection()
+        query = MeasurementRaw.objects.all()
+        query = query.filter(site=site_name_pattern)
+        raw_measurement_list = list(query.distinct(['site']))
+        return np.array([raw_measurement.site
+            for raw_measurement in raw_measurement_list])
+
     def retrieve(self):
         self._set_up_connection()
         # Simple implementation as a start:

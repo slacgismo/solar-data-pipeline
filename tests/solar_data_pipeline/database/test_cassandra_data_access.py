@@ -18,7 +18,8 @@ class TestCassandraDataAccess(unittest.TestCase):
     of other relational database such as PostgreSQL or MySQL.
     """
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         input_power_signals_file_path = os.path.abspath(
             os.path.join(os.path.dirname(__file__),
             "../../fixtures/one_year_power_signals_1.csv"))
@@ -26,19 +27,22 @@ class TestCassandraDataAccess(unittest.TestCase):
             one_year_power_signals = np.loadtxt(file, delimiter=',')
 
         # Use only 5 days in order to reduce execution time:
-        self._power_signals_site_1 = one_year_power_signals[:, :5]
-        self._power_signals_site_2 = one_year_power_signals[:, 5:10]
+        TestCassandraDataAccess._power_signals_site_1 = one_year_power_signals[
+            :, :5]
+        TestCassandraDataAccess._power_signals_site_2 = one_year_power_signals[
+            :, 5:10]
         # Temp:
         # import matplotlib.pyplot as plt
-        # plt.imshow(self._power_signals_site_1)
+        # plt.imshow(TestCassandraDataAccess._power_signals_site_1)
         # plt.show()
 
-        self._cassandra_ip_address = '127.0.0.1'
+        TestCassandraDataAccess._cassandra_ip_address = '127.0.0.1'
 
-        connection.setup([self._cassandra_ip_address], "measurements")
+        connection.setup([TestCassandraDataAccess._cassandra_ip_address],
+                          "measurements")
 
         start_time = datetime(2019, 1, 1, 0, 0, 0)
-        # self._raw_measurements = [
+        # TestCassandraDataAccess._raw_measurements = [
         #     MeasurementRaw.create(
         #         site = "SLACA0000001",
         #         meas_name = "ac_power",
@@ -46,31 +50,37 @@ class TestCassandraDataAccess(unittest.TestCase):
         #         sensor = "000001-0A00-0001_ABC-1000p-AA-1",
         #         station = "001_inverter",
         #         company = "SLAC",
-        #         lat_lon = Geopoint(latitude = 35.00000, longitude = -120.00000),
+        #         lat_lon = Geopoint(latitude = 35.00000,
+        #                            longitude = -120.00000),
         #         meas_description = None,
         #         meas_status = True,
         #         meas_unit = "kW",
         #         meas_val_b = None,
         #         meas_val_f = value,
         #         meas_val_s = None)
-        #     for i, daily_signal in enumerate(self._power_signals_site_1.T)
+        #     for i, daily_signal in
+        #         enumerate(TestCassandraDataAccess._power_signals_site_1.T)
         #     for j, value in enumerate(daily_signal)
         # ]
-        self._raw_measurements = []
-        self._populate_database(self._power_signals_site_1, "SLACA0000001",
+        TestCassandraDataAccess._raw_measurements = []
+        TestCassandraDataAccess._populate_database(
+            TestCassandraDataAccess._power_signals_site_1, "SLACA0000001",
             start_time)
-        self._populate_database(self._power_signals_site_2, "SLACA0000002",
+        TestCassandraDataAccess._populate_database(
+            TestCassandraDataAccess._power_signals_site_2, "SLACA0000002",
             start_time)
 
-    def tearDown(self):
-        for raw_measurement in self._raw_measurements:
+    @classmethod
+    def tearDownClass(self):
+        for raw_measurement in TestCassandraDataAccess._raw_measurements:
             raw_measurement.delete()
 
+    @classmethod
     def _populate_database(self, power_signals, site_name, start_time):
         timedelta_value = 0
         for i, daily_signal in enumerate(power_signals.T):
             for j, value in enumerate(daily_signal):
-                self._raw_measurements.append(
+                TestCassandraDataAccess._raw_measurements.append(
                     MeasurementRaw.create(
                         site = site_name,
                         meas_name = "ac_power",
@@ -78,7 +88,8 @@ class TestCassandraDataAccess(unittest.TestCase):
                         sensor = "000001-0A00-0001_ABC-1000p-AA-1",
                         station = "001_inverter",
                         company = "SLAC",
-                        lat_lon = Geopoint(latitude = 35.00000, longitude = -120.00000),
+                        lat_lon = Geopoint(latitude = 35.00000,
+                                           longitude = -120.00000),
                         meas_description = None,
                         meas_status = True,
                         meas_unit = "kW",
@@ -88,14 +99,21 @@ class TestCassandraDataAccess(unittest.TestCase):
                 )
                 timedelta_value += 5
 
-    #@unittest.skip("This test accesses Cassandra database.")
-    def test_retrieve(self):
-        """
-        CassandraDataAccess accesses Cassandra database. Thus, this test
-        will not be a part of continuous integration.
-        """
+    # @unittest.skip("This test accesses Cassandra database." +
+    # "Thus, this test will not be a part of continuous integration.")
+    def test_find_sites(self):
+        data_access = CassandraDataAccess(
+            TestCassandraDataAccess._cassandra_ip_address)
+        actual_sites = data_access.find_sites("SLACA0000001")
+        expected_sites = np.array(["SLACA0000001"])
+        np.testing.assert_array_equal(actual_sites, expected_sites)
 
-        data_access = CassandraDataAccess(self._cassandra_ip_address)
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
+    def test_retrieve(self):
+
+        data_access = CassandraDataAccess(
+            TestCassandraDataAccess._cassandra_ip_address)
         actual_data = data_access.retrieve()
 
         # Temp:
@@ -111,7 +129,7 @@ class TestCassandraDataAccess(unittest.TestCase):
         # print("actual_data[0].meas_val_f: %s" % (actual_data[0].meas_val_f))
         # print("actual_data[0].ts: %s" % (actual_data[0].ts))
 
-        expected_data = self._power_signals_site_1[:, :2]
+        expected_data = TestCassandraDataAccess._power_signals_site_1[:, :2]
 
         # Temps;
         # plt.imshow(expected_data)

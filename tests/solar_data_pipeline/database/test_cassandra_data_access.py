@@ -104,9 +104,15 @@ class TestCassandraDataAccess(unittest.TestCase):
     def test_find_sites(self):
         data_access = CassandraDataAccess(
             TestCassandraDataAccess._cassandra_ip_address)
+
         actual_sites = data_access.find_sites("SLACA0000001")
         expected_sites = np.array(["SLACA0000001"])
         np.testing.assert_array_equal(actual_sites, expected_sites)
+
+        actual_nonexisting_sites = data_access.find_sites("SLACA9999999")
+        expected_nonexisting_sites = np.array([])
+        np.testing.assert_array_equal(actual_nonexisting_sites,
+                                      expected_nonexisting_sites)
 
     @unittest.skip("This test accesses Cassandra database." +
     "Thus, this test will not be a part of continuous integration.")

@@ -1,6 +1,7 @@
 """
 This module contains the code to retrieve data from Cassandra database
 """
+import functools
 import numpy as np
 from cassandra.cqlengine import connection
 from solar_data_pipeline.database.models.measurements import MeasurementRaw
@@ -38,3 +39,16 @@ class CassandraDataAccess:
         if ((not hasattr(self, '_connection')) or (self._connection is None)):
             self._connection = connection.setup([self._ip_address],
                                                 "measurements")
+
+    def _construct_random_choice_list(self, sites, total_number_of_elements):
+        """
+        Arguments
+        -----------------
+        sites : Numpy array
+            Name of sites.
+        total_number_of_elements: integer
+            Total number of elements of the choice list.
+        """
+        number_per_site = total_number_of_elements // len(sites)
+        return functools.reduce(lambda choice_list, site:
+            choice_list + ([site] * number_per_site), sites, [])

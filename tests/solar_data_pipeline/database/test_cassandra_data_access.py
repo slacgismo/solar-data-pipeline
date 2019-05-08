@@ -26,11 +26,11 @@ class TestCassandraDataAccess(unittest.TestCase):
         with open(input_power_signals_file_path) as file:
             one_year_power_signals = np.loadtxt(file, delimiter=',')
 
-        # Use only 5 days in order to reduce execution time:
+        # Use only 6 days in order to reduce execution time:
         TestCassandraDataAccess._power_signals_site_1 = one_year_power_signals[
-            :, :5]
+            :, :6]
         TestCassandraDataAccess._power_signals_site_2 = one_year_power_signals[
-            :, 5:10]
+            :, 6:12]
         # Temp:
         # import matplotlib.pyplot as plt
         # plt.imshow(TestCassandraDataAccess._power_signals_site_1)
@@ -188,3 +188,17 @@ class TestCassandraDataAccess(unittest.TestCase):
         # plt.show()
 
         np.testing.assert_almost_equal(actual_data, expected_data, decimal=5)
+
+    def test_construct_random_choice_list(self):
+
+        sites = np.array(["SLACA0000001", "SLACA0000002"])
+        total_number_of_elements = 6
+
+        data_access = CassandraDataAccess(
+            TestCassandraDataAccess._cassandra_ip_address)
+        actual_list = data_access._construct_random_choice_list(sites,
+            total_number_of_elements)
+
+        expected_list = ["SLACA0000001"] * 3 + ["SLACA0000002"] * 3
+
+        np.testing.assert_array_equal(actual_list, expected_list)

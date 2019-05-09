@@ -41,39 +41,25 @@ class TestCassandraDataAccess(unittest.TestCase):
         connection.setup([TestCassandraDataAccess._cassandra_ip_address],
                           "measurements")
 
-        start_time = datetime(2019, 1, 1, 0, 0, 0)
-        # TestCassandraDataAccess._raw_measurements = [
-        #     MeasurementRaw.create(
-        #         site = "SLACA0000001",
-        #         meas_name = "ac_power",
-        #         ts = start_time + timedelta(minutes=5*i*j),
-        #         sensor = "000001-0A00-0001_ABC-1000p-AA-1",
-        #         station = "001_inverter",
-        #         company = "SLAC",
-        #         lat_lon = Geopoint(latitude = 35.00000,
-        #                            longitude = -120.00000),
-        #         meas_description = None,
-        #         meas_status = True,
-        #         meas_unit = "kW",
-        #         meas_val_b = None,
-        #         meas_val_f = value,
-        #         meas_val_s = None)
-        #     for i, daily_signal in
-        #         enumerate(TestCassandraDataAccess._power_signals_site_1.T)
-        #     for j, value in enumerate(daily_signal)
-        # ]
-        TestCassandraDataAccess._raw_measurements = []
-        TestCassandraDataAccess._populate_database(
-            TestCassandraDataAccess._power_signals_site_1, "SLACA0000001",
-            start_time)
-        TestCassandraDataAccess._populate_database(
-            TestCassandraDataAccess._power_signals_site_2, "SLACA0000002",
-            start_time)
+        # Note: For now, populate database and keep the data.
+        #       When commit, make sure to put back the code to clean database.
+        # start_time = datetime(2019, 1, 1, 0, 0, 0)
+        #
+        # TestCassandraDataAccess._raw_measurements = []
+        # TestCassandraDataAccess._populate_database(
+        #     TestCassandraDataAccess._power_signals_site_1, "SLACA0000001",
+        #     start_time)
+        # TestCassandraDataAccess._populate_database(
+        #     TestCassandraDataAccess._power_signals_site_2, "SLACA0000002",
+        #     start_time)
 
     @classmethod
     def tearDownClass(self):
-        for raw_measurement in TestCassandraDataAccess._raw_measurements:
-            raw_measurement.delete()
+        # Note: For now, populate database and keep the data.
+        #       When commit, make sure to put back the code to clean database.
+        # for raw_measurement in TestCassandraDataAccess._raw_measurements:
+        #     raw_measurement.delete()
+        pass
 
     @classmethod
     def _populate_database(self, power_signals, site_name, start_time):
@@ -202,3 +188,20 @@ class TestCassandraDataAccess(unittest.TestCase):
         expected_list = ["SLACA0000001"] * 3 + ["SLACA0000002"] * 3
 
         np.testing.assert_array_equal(actual_list, expected_list)
+
+    # @unittest.skip("This test accesses Cassandra database." +
+    # "Thus, this test will not be a part of continuous integration.")
+    def test_query_power_for_given_site(self):
+
+        data_access = CassandraDataAccess(
+            TestCassandraDataAccess._cassandra_ip_address)
+
+        actual_data_1 = data_access._query_power_for_given_site("SLACA0000001")
+        expected_data_1 = TestCassandraDataAccess._power_signals_site_1
+        np.testing.assert_almost_equal(actual_data_1, expected_data_1,
+                                       decimal=5)
+
+        actual_data_2 = data_access._query_power_for_given_site("SLACA0000002")
+        expected_data_2 = TestCassandraDataAccess._power_signals_site_2
+        np.testing.assert_almost_equal(actual_data_2, expected_data_2,
+                                       decimal=5)

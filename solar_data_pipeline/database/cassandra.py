@@ -29,8 +29,8 @@ class CassandraDataAccess:
     def retrieve(self):
         self._set_up_connection()
         # Simple implementation as a start:
-        values = MeasurementRaw.objects().all().limit(
-                2 * 288).values_list('meas_val_f')
+        values = MeasurementRaw.objects().all().values_list('meas_val_f')
+
         return np.array(values).reshape(288, -1, order='F')
         # values = MeasurementRaw.objects().all().values_list('meas_val_f')
         # return np.reshape(np.array(values), (288, -1), order='F')
@@ -52,3 +52,18 @@ class CassandraDataAccess:
         number_per_site = total_number_of_elements // len(sites)
         return functools.reduce(lambda choice_list, site:
             choice_list + ([site] * number_per_site), sites, [])
+
+    def _query_power_for_all_sites(self):
+        self._set_up_connection()
+
+        sites = self.get_sites()
+        data_dictionary = {site: self._query_power_for_given_sites(site)
+            for site in sites }
+        return data_dictionary
+
+    def _query_power_for_given_site(self, site):
+        self._set_up_connection()
+
+        values = MeasurementRaw.objects.filter(
+            site=site).values_list('meas_val_f')
+        return np.array(values).reshape(288, -1, order='F')

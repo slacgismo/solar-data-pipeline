@@ -100,6 +100,8 @@ class TestCassandraDataAccess(unittest.TestCase):
         np.testing.assert_array_equal(actual_nonexisting_sites,
                                       expected_nonexisting_sites)
 
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_get_sites(self):
         data_access = CassandraDataAccess(
             TestCassandraDataAccess._cassandra_ip_address)
@@ -175,6 +177,8 @@ class TestCassandraDataAccess(unittest.TestCase):
 
         np.testing.assert_almost_equal(actual_data, expected_data, decimal=5)
 
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_construct_random_choice_list(self):
 
         sites = np.array(["SLACA0000001", "SLACA0000002"])
@@ -191,6 +195,26 @@ class TestCassandraDataAccess(unittest.TestCase):
 
     # @unittest.skip("This test accesses Cassandra database." +
     # "Thus, this test will not be a part of continuous integration.")
+    def test_query_power_for_all_sites(self):
+
+        data_access = CassandraDataAccess(
+            TestCassandraDataAccess._cassandra_ip_address)
+
+        actual_data = data_access._query_power_for_all_sites()
+        expected_data = {"SLACA0000001":
+                         TestCassandraDataAccess._power_signals_site_1,
+                         "SLACA0000002":
+                         TestCassandraDataAccess._power_signals_site_2}
+        np.testing.assert_array_equal(actual_data.keys(), expected_data.keys())
+        np.testing.assert_almost_equal(actual_data["SLACA0000001"],
+                                       expected_data["SLACA0000001"],
+                                       decimal=5)
+        np.testing.assert_almost_equal(actual_data["SLACA0000002"],
+                                       expected_data["SLACA0000002"],
+                                       decimal=5)
+
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_query_power_for_given_site(self):
 
         data_access = CassandraDataAccess(

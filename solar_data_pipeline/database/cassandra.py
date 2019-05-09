@@ -56,9 +56,9 @@ class CassandraDataAccess:
     def _query_power_for_all_sites(self):
         self._set_up_connection()
 
-        sites = self.get_sites()
-        data_dictionary = {site: self._query_power_for_given_sites(site)
-            for site in sites }
+        sites = self.get_sites().tolist()
+        data_dictionary = {site: self._query_power_for_given_site(site)
+            for site in sites}
         return data_dictionary
 
     def _query_power_for_given_site(self, site):

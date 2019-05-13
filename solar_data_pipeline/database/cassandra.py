@@ -26,10 +26,10 @@ class CassandraDataAccess:
         return np.array([raw_measurement.site
             for raw_measurement in raw_measurement_list])
 
-    def retrieve(self, start_time=None, end_time=None):
+    def retrieve(self, sites=None, start_time=None, end_time=None):
         self._set_up_connection()
 
-        sites = self.get_sites().tolist()
+        sites = self._get_site_lists_for_retrieve(sites=sites)
 
         data_candidates = self._get_data_candidate(sites,
             start_time=start_time, end_time=end_time)
@@ -50,6 +50,17 @@ class CassandraDataAccess:
         if ((not hasattr(self, '_connection')) or (self._connection is None)):
             self._connection = connection.setup([self._ip_address],
                                                 "measurements")
+
+    def _get_site_lists_for_retrieve(self, sites=None):
+        """
+        Make sure that list is used instead of any other array-like object.
+        """
+        if sites is None:
+            return self.get_sites().tolist()
+        elif not isinstance(sites, list):
+            return sites.tolist()
+        else:
+            return sites
 
     def _random_choice(self, data_candidates, random_choice_list,
         total_number_of_columns):
@@ -89,6 +100,6 @@ class CassandraDataAccess:
             query = query.filter(ts__gte=start_time)
         if end_time is not None:
             query = query.filter(ts__lte=end_time)
-        values = query.values_list('meas_val_f')
+        values = query.limit(288 * 365).values_list('meas_val_f')
         value_array = np.array(values)
         return value_array.reshape(288, -1, order='F')

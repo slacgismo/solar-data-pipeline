@@ -88,8 +88,8 @@ class TestCassandraDataAccess(unittest.TestCase):
     def _assert_number_of_matching_daily_signals(self, actual, original_data,
         expected_number_of_data_match):
         # data_match = (actual == original_data)
-        data_match = np.array([np.array_equal(actual[i],
-                                 original_data[i])
+        data_match = np.array([np.allclose(actual[i],
+                                 original_data[i], rtol=1e-04, atol=1e-06)
                                  for i in range(len(original_data))])
         actual_number_of_data_match = np.sum(data_match)
         self.assertEqual(actual_number_of_data_match,
@@ -185,6 +185,38 @@ class TestCassandraDataAccess(unittest.TestCase):
         # plt.show()
 
         self.assertEqual(len(actual_data.T), 4)
+
+    # @unittest.skip("This test accesses Cassandra database." +
+    # "Thus, this test will not be a part of continuous integration.")
+    def test_retrieve_for_sites(self):
+
+        sites = ["SLACA0000001"]
+
+        data_access = CassandraDataAccess(
+            TestCassandraDataAccess._cassandra_ip_address)
+        actual_data = data_access.retrieve(sites=sites)
+
+        expected_data = TestCassandraDataAccess._power_signals_site_1
+
+        self._assert_number_of_matching_daily_signals(actual_data.T,
+            expected_data.T, 6)
+        np.testing.assert_almost_equal(actual_data, expected_data, decimal=5)
+
+    def test_get_site_lists_for_retrieve(self):
+
+        expected_sites = ["SLACA0000001", "SLACA0000002"]
+
+        sites_1 = ["SLACA0000001", "SLACA0000002"]
+        data_access = CassandraDataAccess(
+            TestCassandraDataAccess._cassandra_ip_address)
+        actual_sites_1 = data_access._get_site_lists_for_retrieve(sites=sites_1)
+        self.assertEqual(actual_sites_1, expected_sites)
+
+        sites_2 = np.array(["SLACA0000001", "SLACA0000002"])
+        data_access = CassandraDataAccess(
+            TestCassandraDataAccess._cassandra_ip_address)
+        actual_sites_2 = data_access._get_site_lists_for_retrieve(sites=sites_1)
+        self.assertEqual(actual_sites_2, expected_sites)
 
     # @unittest.skip("This test accesses Cassandra database." +
     # "Thus, this test will not be a part of continuous integration.")

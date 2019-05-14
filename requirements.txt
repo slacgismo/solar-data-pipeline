@@ -1,2 +1,4 @@
 numpy>=1.16
 cassandra-driver
+solar-data-tools
+statistical-clear-sky

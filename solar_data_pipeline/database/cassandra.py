@@ -4,6 +4,7 @@ This module contains the code to retrieve data from Cassandra database
 import functools
 import numpy as np
 from cassandra.cqlengine import connection
+from cassandra.cqlengine.named import NamedTable
 from solar_data_pipeline.database.models.measurements import MeasurementRaw
 
 class CassandraDataAccess:
@@ -92,14 +93,42 @@ class CassandraDataAccess:
         return data_dictionary
 
     def _query_power_for_given_site(self, site, start_time=None, end_time=None):
+
+        data_array = self._query_power_for_given_site_helper(site,
+            start_time=start_time, end_time=end_time)
+
+        data_transformation = self._get_data_transformation()
+
+        return data_transformation.transform(data_array, datetimekey='ts',
+            ac_power_key='meas_val_f')
+
+    def _query_power_for_given_site_helper(self, site, start_time=None,
+        end_time=None):
         self._set_up_connection()
 
-        query = MeasurementRaw.objects.filter(site=site)
+        measurement_raw = NamedTable("measurements", "measurement_raw")
+        query = measurement_raw.objects.limit(1000000).filter(site=site)
         query = query.filter(meas_name='ac_power')
         if start_time is not None:
             query = query.filter(ts__gte=start_time)
         if end_time is not None:
             query = query.filter(ts__lte=end_time)
-        values = query.limit(288 * 365).values_list('meas_val_f')
-        value_array = np.array(values)
-        return value_array.reshape(288, -1, order='F')
+        data_array = np.array(query)
+
+        return data_array
+
+    def _get_data_transformation(self):
+        if ((not hasattr(self, '_data_transformation')) or
+           (self._data_transformation is None)):
+           from solar_data_pipeline.database.utilities.data_transformation\
+               import AllDataTransformation
+           self._data_transformation = AllDataTransformation()
+        return self._data_transformation
+
+    def _set_csv_access(self, data_transformation):
+        """
+        For dependency injection for testing, i.e. for injecting mock.
+        This method is set to be private, in order to indicate that it is
+        not accessed from the client code.
+        """
+        self._data_transformation = data_transformation

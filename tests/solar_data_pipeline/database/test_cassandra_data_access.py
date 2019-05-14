@@ -95,8 +95,8 @@ class TestCassandraDataAccess(unittest.TestCase):
         self.assertEqual(actual_number_of_data_match,
                          expected_number_of_data_match)
 
-    # @unittest.skip("This test accesses Cassandra database." +
-    # "Thus, this test will not be a part of continuous integration.")
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_find_sites(self):
         data_access = CassandraDataAccess(
             TestCassandraDataAccess._cassandra_ip_address)
@@ -110,8 +110,8 @@ class TestCassandraDataAccess(unittest.TestCase):
         np.testing.assert_array_equal(actual_nonexisting_sites,
                                       expected_nonexisting_sites)
 
-    # @unittest.skip("This test accesses Cassandra database." +
-    # "Thus, this test will not be a part of continuous integration.")
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_get_sites(self):
         data_access = CassandraDataAccess(
             TestCassandraDataAccess._cassandra_ip_address)
@@ -153,8 +153,8 @@ class TestCassandraDataAccess(unittest.TestCase):
         self._assert_number_of_matching_daily_signals(actual_data.T,
             TestCassandraDataAccess._power_signals_site_2.T, 3)
 
-    # @unittest.skip("This test accesses Cassandra database." +
-    # "Thus, this test will not be a part of continuous integration.")
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_retrieve_for_date_range(self):
 
         start_time = datetime(2019, 1, 1, 0, 0, 0)
@@ -202,6 +202,8 @@ class TestCassandraDataAccess(unittest.TestCase):
             expected_data.T, 6)
         np.testing.assert_almost_equal(actual_data, expected_data, decimal=5)
 
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_get_site_lists_for_retrieve(self):
 
         expected_sites = ["SLACA0000001", "SLACA0000002"]
@@ -218,8 +220,8 @@ class TestCassandraDataAccess(unittest.TestCase):
         actual_sites_2 = data_access._get_site_lists_for_retrieve(sites=sites_1)
         self.assertEqual(actual_sites_2, expected_sites)
 
-    # @unittest.skip("This test accesses Cassandra database." +
-    # "Thus, this test will not be a part of continuous integration.")
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_construct_random_choice_list(self):
 
         sites = np.array(["SLACA0000001", "SLACA0000002"])
@@ -234,8 +236,8 @@ class TestCassandraDataAccess(unittest.TestCase):
 
         np.testing.assert_array_equal(actual_list, expected_list)
 
-    # @unittest.skip("This test accesses Cassandra database." +
-    # "Thus, this test will not be a part of continuous integration.")
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_get_data_candidate(self):
 
         data_access = CassandraDataAccess(
@@ -255,8 +257,8 @@ class TestCassandraDataAccess(unittest.TestCase):
                                        expected_data["SLACA0000002"],
                                        decimal=5)
 
-    # @unittest.skip("This test accesses Cassandra database." +
-    # "Thus, this test will not be a part of continuous integration.")
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_query_power_for_given_site(self):
 
         data_access = CassandraDataAccess(

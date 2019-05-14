@@ -1,4 +1,4 @@
-
+from solardatatools.dataio import get_pvdaq_data
 
 class CsvAccess:
 

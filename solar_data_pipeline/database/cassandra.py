@@ -125,6 +125,9 @@ class CassandraDataAccess:
            self._data_transformation = AllDataTransformation()
         return self._data_transformation
 
+    def set_data_transformation(self, data_transformation):
+       self._data_transformation = data_transformation
+
     def _set_csv_access(self, data_transformation):
         """
         For dependency injection for testing, i.e. for injecting mock.

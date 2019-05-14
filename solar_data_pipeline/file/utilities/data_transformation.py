@@ -5,6 +5,8 @@ from abc import ABCMeta, abstractmethod
 import pandas as pd
 from solardatatools.data_transforms\
  import standardize_time_axis, make_2d, fix_time_shifts
+from statistical_clear_sky.utilities.data_conversion\
+ import make_time_series
 from solar_data_pipeline.utilities.data_trainsformation\
  import AbstractDataTransformation
 
@@ -25,9 +27,10 @@ class AllDataTransformation(AbstractDataTransformation):
             containing power signals.
         """
         data_frame = pd.DataFrame(data_array.tolist())
+        data_frame.replace(-999999.0, np.NaN, inplace=True)
         # data_frame.set_index(datetimekey)
-        standardized_data_frame = standardize_time_axis(data_frame,
-            datetimekey=datetimekey, timeindex=True)
+        standardized_data_frame = standardize_time_axis(make_time_series(data_frame, return_keys=False),
+            timeindex=True)
         power_matrix = make_2d(standardized_data_frame, key=ac_power_key,
             zero_nighttime=True, interp_missing=True)
         return fix_time_shifts(power_matrix)

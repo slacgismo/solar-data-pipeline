@@ -100,7 +100,7 @@ class CassandraDataAccess:
         data_transformation = self._get_data_transformation()
 
         return data_transformation.transform(data_array, datetimekey='ts',
-            ac_power_key='meas_val_f')
+            ac_power_key='ac_power_01')
 
     def _query_power_for_given_site_helper(self, site, start_time=None,
         end_time=None):

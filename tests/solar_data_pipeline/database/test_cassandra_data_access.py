@@ -10,6 +10,8 @@ from solar_data_pipeline.database.cassandra import CassandraDataAccess
 from solar_data_pipeline.database.models.measurements import MeasurementRaw
 from solar_data_pipeline.database.models.measurements import Geopoint
 
+@unittest.skip("This test accesses Cassandra database." +
+"Thus, this test will not be a part of continuous integration.")
 class TestCassandraDataAccess(unittest.TestCase):
     """
     This test depends on Cassandra database thus cannot be run in Continuous
@@ -186,8 +188,8 @@ class TestCassandraDataAccess(unittest.TestCase):
 
         self.assertEqual(len(actual_data.T), 4)
 
-    # @unittest.skip("This test accesses Cassandra database." +
-    # "Thus, this test will not be a part of continuous integration.")
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_retrieve_for_sites(self):
 
         sites = ["SLACA0000001"]
@@ -274,24 +276,24 @@ class TestCassandraDataAccess(unittest.TestCase):
         np.testing.assert_almost_equal(actual_data_2, expected_data_2,
                                        decimal=5)
 
-    # @unittest.skip("This test accesses Cassandra database." +
-    # "Thus, this test will not be a part of continuous integration.")
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_query_power_for_given_site_with_time_range(self):
 
         start_time = datetime(2019, 1, 1, 0, 0, 0)
-        end_time = datetime(2019, 1, 3, 23, 55, 0)
+        end_time = datetime(2019, 1, 1, 23, 55, 0)
 
         data_access = CassandraDataAccess(
             TestCassandraDataAccess._cassandra_ip_address)
 
         actual_data_1 = data_access._query_power_for_given_site("SLACA0000001",
             start_time=start_time, end_time=end_time)
-        expected_data_1 = TestCassandraDataAccess._power_signals_site_1[:,:3]
+        expected_data_1 = TestCassandraDataAccess._power_signals_site_1[:,:1]
         np.testing.assert_almost_equal(actual_data_1, expected_data_1,
                                        decimal=5)
 
         actual_data_2 = data_access._query_power_for_given_site("SLACA0000002",
             start_time=start_time, end_time=end_time)
-        expected_data_2 = TestCassandraDataAccess._power_signals_site_2[:,:3]
+        expected_data_2 = TestCassandraDataAccess._power_signals_site_2[:,:1]
         np.testing.assert_almost_equal(actual_data_2, expected_data_2,
                                        decimal=5)

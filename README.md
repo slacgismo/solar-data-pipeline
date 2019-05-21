@@ -4,15 +4,18 @@ Gets solar data from various source
 
 ## Usage
 
-#### Example 1: Example to get data from Cassandra Database.
+#### Example 1: Example to get random data from Cassandra Database.
 
 ```python
 import numpy as np
-from solar_data_pipeline.database.cassandra import CassandraDataAccess
+from solar_data_pipeline.database.raw_cassandra import RawCassandraDataAccess
 
-cassandra_ip_address = "127.0.0.1"
-data_access = CassandraDataAccess(cassandra_ip_address)
-data = data_access.retrieve()
+number_of_sites = 4
+number_of_days_per_site = 10
+
+data_access = CassandraDataAccess()
+data = data_access.retrieve(number_of_sites=number_of_sites,
+        number_of_days_per_site=number_of_days_per_site)
 ```
 
 ## Versioning

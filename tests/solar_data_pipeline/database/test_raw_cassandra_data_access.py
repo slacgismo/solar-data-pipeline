@@ -13,16 +13,16 @@ class TestRawCassandraDataAccess(unittest.TestCase):
     Thus, it acts as acceptance test.
     """
 
-    @unittest.skip("This test accesses Cassandra database." +
-    "Thus, this test will not be a part of continuous integration.")
+    # @unittest.skip("This test accesses Cassandra database." +
+    # "Thus, this test will not be a part of continuous integration.")
     def test_retrieve(self):
 
         number_of_sites = 4
         number_of_days_per_site = 10
 
         data_access = RawCassandraDataAccess()
-        actual_data = data_access.retrieve(number_of_sites = number_of_sites,
-            number_of_days_per_site = number_of_days_per_site)
+        actual_data = data_access.retrieve(number_of_sites=number_of_sites,
+            number_of_days_per_site=number_of_days_per_site)
 
         self.assertEqual(actual_data.shape[1], number_of_sites *
             number_of_days_per_site)

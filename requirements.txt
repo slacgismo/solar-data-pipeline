@@ -1,4 +1,5 @@
 numpy>=1.16
+pandas
 cassandra-driver
-solar-data-tools
+git+git://github.com/slacgismo/solar-data-tools@development#egg=solar-data-tools
 statistical-clear-sky

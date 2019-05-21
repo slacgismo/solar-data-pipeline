@@ -1,0 +1,54 @@
+{% set name = "solar-data-pipeline" %}
+{% set version = "0.1.0" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: a6efae593d2aedcb8b2712d0e0d7788b7a4c90ab052964adc5ce7b275464c2ee
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
+
+requirements:
+  host:
+    - numpy
+    - pandas
+    - pip
+    - python
+    - solar-data-tools
+    - statistical-clear-sky
+  run:
+    - numpy
+    - pandas
+    - python
+    - solar-data-tools
+    - statistical-clear-sky
+
+test:
+  imports:
+    - solar_data_pipeline
+    - solar_data_pipeline.database
+    - solar_data_pipeline.database.models
+    - solar_data_pipeline.database.utilities
+    - solar_data_pipeline.file
+    - solar_data_pipeline.file.utilities
+    - solar_data_pipeline.utilities
+  commands:
+    - python -m unittest
+
+about:
+  home: https://github.com/slacgismo/solar-data-pipeline
+  license: BSD
+  license_family: BSD
+  license_file:
+  summary: Data pipeline for solar data
+  doc_url:
+  dev_url:
+
+extra:
+  recipe-maintainers:
+    - tadatoshi

@@ -13,8 +13,8 @@ class TestRawCassandraDataAccess(unittest.TestCase):
     Thus, it acts as acceptance test.
     """
 
-    # @unittest.skip("This test accesses Cassandra database." +
-    # "Thus, this test will not be a part of continuous integration.")
+    @unittest.skip("This test accesses Cassandra database." +
+    "Thus, this test will not be a part of continuous integration.")
     def test_retrieve(self):
 
         number_of_sites = 4
